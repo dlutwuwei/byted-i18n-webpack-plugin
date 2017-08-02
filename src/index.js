@@ -41,7 +41,8 @@ class I18nPlugin {
         chunks.forEach(chunk => files.push(...chunk.files));
         files.push(...compilation.additionalChunkAssets);
         const filteredFiles = files.filter(ModuleFilenameHelpers.matchObject.bind(null, options));
-        Object.keys(this.localization()).forEach((lan) => {
+        const locale = this.localization();
+        Object.keys(locale).forEach((lan) => {
           textTable[lan] = {};
           filteredFiles.forEach((file) => {
             const asset = compilation.assets[file];
@@ -58,7 +59,7 @@ class I18nPlugin {
               textTable[lan][fileName] = table;
               match.forEach((item) => {
                 const itemName = item.slice(name.length + 2, item.length - 1);
-                table[itemName] = (this.localization()[lan] || {})[itemName];
+                table[itemName] = (locale[lan] || {})[itemName];
               });
             }
           });
