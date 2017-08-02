@@ -70,7 +70,7 @@ class I18nPlugin {
     });
     // 编译完成
     compiler.plugin('done', () => {
-      Object.keys(this.localization()).forEach((lan) => {
+      Object.keys(this.locale).forEach((lan) => {
         // no output path define;
         let outputFilePath = '';
         if (process.env.NODE_ENV !== 'production' && this.devPath) {
