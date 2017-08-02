@@ -34,15 +34,16 @@ class I18nPlugin {
     const { options } = this;
     const name = this.objectName;
     let outputPath = compiler.options.output.path;
-
+    compiler.plugin('compile', () => {
+      this.locale = this.localization();
+    });
     compiler.plugin('compilation', (compilation) => {
       compilation.plugin('optimize-chunk-assets', (chunks, callback) => {
         const files = [];
         chunks.forEach(chunk => files.push(...chunk.files));
         files.push(...compilation.additionalChunkAssets);
         const filteredFiles = files.filter(ModuleFilenameHelpers.matchObject.bind(null, options));
-        const locale = this.localization();
-        Object.keys(locale).forEach((lan) => {
+        Object.keys(this.locale).forEach((lan) => {
           textTable[lan] = {};
           filteredFiles.forEach((file) => {
             const asset = compilation.assets[file];
@@ -59,7 +60,7 @@ class I18nPlugin {
               textTable[lan][fileName] = table;
               match.forEach((item) => {
                 const itemName = item.slice(name.length + 2, item.length - 1);
-                table[itemName] = (locale[lan] || {})[itemName];
+                table[itemName] = (this.locale[lan] || {})[itemName];
               });
             }
           });
