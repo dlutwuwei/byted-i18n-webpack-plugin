@@ -51,7 +51,7 @@ class I18nPlugin {
             const regex = new RegExp(`\\W${name}\\.\\w+?\\W`, 'g');
             const match = input.match(regex);
             if (match) {
-              let fileName = file.split('.')[0];
+              let fileName = file.replace(/\.\w+$/, '');
               if (this.fileMap) {
                 fileName = this.fileMap[fileName] || fileName;
               }
