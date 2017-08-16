@@ -25,6 +25,7 @@ class I18nPlugin {
     this.failOnMissing = !!this.options.failOnMissing;
     this.hideMessage = this.options.hideMessage || false;
     this.objectName = this.options.objectName || '__';
+    this.fileName = this.options.fileName || '';
     this.fileMap = this.options.fileMap;
     this.outputPath = this.options.outputPath;
     this.devPath = this.options.devPath;
@@ -33,6 +34,7 @@ class I18nPlugin {
   apply(compiler) {
     const { options } = this;
     const name = this.objectName;
+    const babelModuleName = `_${this.fileName}2\\.default`;
     let outputPath = compiler.options.output.path;
     compiler.plugin('compile', () => {
       this.locale = this.localization();
@@ -48,7 +50,7 @@ class I18nPlugin {
           filteredFiles.forEach((file) => {
             const asset = compilation.assets[file];
             const input = asset.source();
-            const regex = new RegExp(`\\W${name}\\.\\w+?\\W`, 'g');
+            const regex = new RegExp(`\\W(${name}|${babelModuleName})\\.\\w+?\\W`, 'g');
             const match = input.match(regex);
             if (match) {
               let fileName = file.replace(/\.\w+$/, '');
