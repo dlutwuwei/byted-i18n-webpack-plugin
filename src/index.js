@@ -32,9 +32,8 @@ class I18nPlugin {
   }
 
   apply(compiler) {
-    const { options } = this;
-    const name = this.objectName;
-    const babelModuleName = `_${this.fileName}2\\.default`;
+    const { options, objectName: name, fileName } = this;
+    const babelModuleName = `_${fileName}2\\.default`;
     let outputPath = compiler.options.output.path;
     compiler.plugin('compile', () => {
       this.locale = this.localization();
@@ -44,6 +43,7 @@ class I18nPlugin {
         const files = [];
         chunks.forEach(chunk => files.push(...chunk.files));
         files.push(...compilation.additionalChunkAssets);
+        // 过滤文件支持exclude, include, regex test
         const filteredFiles = files.filter(ModuleFilenameHelpers.matchObject.bind(null, options));
         Object.keys(this.locale).forEach((lan) => {
           textTable[lan] = {};
@@ -53,7 +53,8 @@ class I18nPlugin {
             const regex = new RegExp(`\\W(${name}|${babelModuleName})\\.\\w+?\\W`, 'g');
             const match = input.match(regex);
             if (match) {
-              let fileName = file.replace(/\.\w+$/, '');
+              // be careful of hash code
+              let fileName = file.split('.').slice(0, -1).join('');
               if (this.fileMap) {
                 fileName = this.fileMap[fileName] || fileName;
               }
