@@ -63,7 +63,7 @@ class I18nPlugin {
               textTable[lan][fileName] = table;
               match.forEach((item) => {
                 const itemName = item.match(/\.(\w+)\W$/)[1];
-                table[itemName] = (this.locale[lan] || {})[itemName];
+                table[itemName] = (this.locale[lan] || this.locale.en || {})[itemName];
               });
             }
           });
