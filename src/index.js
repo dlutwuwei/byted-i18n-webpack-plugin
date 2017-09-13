@@ -54,7 +54,12 @@ class I18nPlugin {
             const match = input.match(regex);
             if (match) {
               // be careful of hash code
-              let fileName = file.split('.').slice(0, -1).join('');
+              let fileName;
+              if (process.env.NODE_ENV === 'development') {
+                fileName = file.split('.').slice(0, -1).join('.');
+              } else {
+                fileName = file.split('.').slice(0, -2).join('.');
+              }
               if (this.fileMap) {
                 fileName = this.fileMap[fileName] || fileName;
               }
@@ -63,7 +68,7 @@ class I18nPlugin {
               textTable[lan][fileName] = table;
               match.forEach((item) => {
                 const itemName = item.match(/\.(\w+)\W$/)[1];
-                table[itemName] = (this.locale[lan] || this.locale.en || {})[itemName];
+                table[itemName] = (this.locale[lan] || {})[itemName] || this.locale.en[itemName];
               });
             }
           });
@@ -76,7 +81,7 @@ class I18nPlugin {
       Object.keys(this.locale).forEach((lan) => {
         // no output path define;
         let outputFilePath = '';
-        if (process.env.NODE_ENV !== 'production' && this.devPath) {
+        if (process.env.NODE_ENV === 'development' && this.devPath) {
           outputPath = this.devPath || process.cwd();
           outputFilePath = path.join(outputPath, `${lan}.text.json`);
         } else {
