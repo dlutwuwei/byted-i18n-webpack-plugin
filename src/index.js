@@ -6,6 +6,7 @@ import fs from 'fs';
 import path from 'path';
 import mkdirp from 'mkdirp';
 import ModuleFilenameHelpers from 'webpack/lib/ModuleFilenameHelpers';
+import globToRegExp from 'glob-to-regexp';
 
 const textTable = {};
 
@@ -29,6 +30,8 @@ class I18nPlugin {
     this.fileMap = this.options.fileMap;
     this.outputPath = this.options.outputPath;
     this.devPath = this.options.devPath;
+    this.testers = [];
+    this.globs = [];
   }
 
   apply(compiler) {
@@ -37,6 +40,11 @@ class I18nPlugin {
     let outputPath = compiler.options.output.path;
     compiler.plugin('compile', () => {
       this.locale = this.localization();
+      Object.keys(this.fileMap).forEach((name) => {
+        const regex = globToRegExp(name);
+        this.testers.push(regex);
+        this.globs.push(name);
+      });
     });
     compiler.plugin('compilation', (compilation) => {
       compilation.plugin('optimize-chunk-assets', (chunks, callback) => {
@@ -56,12 +64,17 @@ class I18nPlugin {
               // be careful of hash code
               let fileName;
               if (process.env.NODE_ENV === 'development') {
+                // 开发环境不带hash, 只需去掉后缀
                 fileName = file.split('.').slice(0, -1).join('.');
               } else {
                 fileName = file.split('.').slice(0, -2).join('.');
               }
               if (this.fileMap) {
-                fileName = this.fileMap[fileName] || fileName;
+                this.testers.forEach((regex, index) => {
+                  if (regex.test(fileName)) {
+                    fileName = this.fileMap[this.globs[index]];
+                  }
+                });
               }
               // 获取以及存在的文案表，否则初始化为空对象
               const table = textTable[lan][fileName] || {};

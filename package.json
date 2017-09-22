@@ -1,6 +1,6 @@
 {
   "name": "topbuzz-i18n-webpack-plugin",
-  "version": "1.0.16",
+  "version": "1.1.2",
   "author": "dlutwuwei",
   "description": "Embed localization into your bundle",
   "main": "dist/cjs.js",
@@ -70,6 +70,9 @@
     ]
   },
   "dependencies": {
-    "mkdirp": "^0.5.1"
+    "glob-to-regexp": "^0.3.0",
+    "install": "^0.10.1",
+    "mkdirp": "^0.5.1",
+    "npm": "^5.4.2"
   }
 }
